@@ -29,6 +29,12 @@ export const booksRouter = async (req, res) => {
             return;
         }
         const book = await getBody(req);
+        if (!book.title || typeof book.title !== 'string' ||
+            !book.author_id || isNaN(parseInt(book.author_id))) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Invalid book data' }));
+            return;
+        }
         const updatedBook = await updateBook(id, book);
         if (updatedBook) {
             res.writeHead(200, { 'Content-Type': 'application/json' });

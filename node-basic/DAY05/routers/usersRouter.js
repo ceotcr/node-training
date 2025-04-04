@@ -28,6 +28,11 @@ export const usersRouter = async (req, res) => {
             return;
         }
         const user = await getBody(req);
+        if (!user.name || typeof user.name !== 'string' || !user.email || typeof user.email !== 'string') {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Invalid user data' }));
+            return;
+        }
         const updatedUser = await updateUser(id, user);
         if (updatedUser) {
             res.writeHead(200, { 'Content-Type': 'application/json' });

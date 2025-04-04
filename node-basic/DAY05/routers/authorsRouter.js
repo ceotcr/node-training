@@ -28,6 +28,11 @@ export const authorsRouter = async (req, res) => {
             return;
         }
         const author = await getBody(req);
+        if (!author.name || typeof author.name !== 'string') {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Invalid author data' }));
+            return;
+        }
         const updatedAuthor = await updateAuthor(id, author);
         if (updatedAuthor) {
             res.writeHead(200, { 'Content-Type': 'application/json' });

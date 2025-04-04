@@ -28,6 +28,11 @@ export const genresRouter = async (req, res) => {
             return;
         }
         const genre = await getBody(req);
+        if (!genre.name || typeof genre.name !== 'string') {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ message: 'Invalid genre data' }));
+            return;
+        }
         const updatedGenre = await updateGenre(id, genre);
         if (updatedGenre) {
             res.writeHead(200, { 'Content-Type': 'application/json' });
