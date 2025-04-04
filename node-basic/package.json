@@ -5,9 +5,17 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
+    "day5:dev": "nodemon ./DAY05/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "mysql2": "^3.14.0",
+    "nodemon": "^3.1.9"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.7"
+  }
 }
