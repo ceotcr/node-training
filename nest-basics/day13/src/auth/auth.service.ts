@@ -12,7 +12,6 @@ type AuthOutput = {
     name: string;
     email: string;
 };
-const tokenBlackList = new Set<string>();
 @Injectable()
 export class AuthService {
     constructor(private readonly usersService: UsersService, private readonly jwtService: JwtService) { }
@@ -27,33 +26,28 @@ export class AuthService {
         if (user.password !== password) {
             throw new BadRequestException('Invalid password');
         }
-        const jti = randomUUID();
-        const payload = { email: user.email, sub: user.id, jti };
+        const payload = { email: user.email, sub: user.id };
         const accessToken = this.jwtService.sign(payload)
         return { accessToken, id: user.id, name: user.name, email: user.email };
     }
 
-    async logout(jti: string) {
-        tokenBlackList.add(jti);
-        console.log(tokenBlackList)
+    async logout(userId: number) {
+        this.usersService.addLogoutLog(userId);
         return { message: 'Logged out successfully' };
-    }
-
-    async isTokenBlacklisted(jti: string): Promise<boolean> {
-        return tokenBlackList.has(jti);
     }
 
     async getUserFromToken(token: string) {
         try {
             const payload = this.jwtService.verify(token);
-            if (await this.isTokenBlacklisted(payload.jti)) {
+            const logoutLog = this.usersService.getLogoutLog(payload.sub);
+            if (logoutLog && logoutLog > new Date(payload.iat * 1000)) {
                 return null;
             }
             const user = await this.usersService.getUserByEmail(payload.email);
             if (!user) {
                 return null;
             }
-            return { jti: payload.jti, id: user.id, name: user.name, email: user.email };
+            return { id: user.id, name: user.name, email: user.email };
         } catch (error) {
             return null;
         }
